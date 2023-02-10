@@ -8,8 +8,7 @@ const request = axios.create({
 // respone interceptor
 request.interceptors.response.use(
   (response) => {
-    let { data } = response
-    return data
+    return response.data
   },
   (error) => {
     console.log('请求出错：', error)
