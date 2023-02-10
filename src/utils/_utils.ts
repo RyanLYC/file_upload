@@ -142,3 +142,34 @@ export const calculateHashIdle = async (
     window.requestIdleCallback(workLoop)
   })
 }
+
+/**
+ * @description 绑定Drag的相关事件
+ * @param domRef Dmo 的ref 对象
+ * @param cb call back 函数 (file: File) => void
+ */
+export const bindDragEvent = (
+  domRef: Ref<HTMLDivElement | undefined>,
+  cb: (file: File) => void
+) => {
+  if (domRef && domRef.value) {
+    domRef.value.addEventListener('dragover', (e) => {
+      domRef.value!.style.borderColor = 'red'
+      e.preventDefault()
+    })
+    domRef.value.addEventListener('dragleave', (e) => {
+      domRef.value!.style.borderColor = '#eee'
+      e.preventDefault()
+    })
+    domRef.value.addEventListener(
+      'drop',
+      (e: any) => {
+        const fileList = e.dataTransfer.files
+        domRef.value!.style.borderColor = '#eee'
+        cb && cb(fileList[0])
+        e.preventDefault()
+      },
+      false
+    )
+  }
+}

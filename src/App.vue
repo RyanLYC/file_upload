@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <div ref="drag" id="drag">
+    <div ref="dragRef" id="drag">
       <input type="file" name="file" @change="handleFileChange" />
     </div>
     <div>上传进度</div>
@@ -44,12 +44,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import AppData from './AppData'
+import { bindDragEvent } from './utils/_utils'
 
 const appData = new AppData()
 
-const handleFileChange = (e: any) => {
+const handleFileChange = async (e: any) => {
   const [file] = e.target.files
   if (!file) return
   appData.selectedFile(file)
@@ -70,6 +71,11 @@ const cubeWidth = computed(() => {
 const handleUpload = () => {
   appData.handleUpload()
 }
+
+const dragRef = ref<HTMLDivElement>()
+onMounted(() => {
+  bindDragEvent(dragRef, appData.selectedFile)
+})
 </script>
 <style scoped>
 .app > div {
