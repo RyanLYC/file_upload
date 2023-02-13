@@ -20,7 +20,23 @@
     </div>
     {{ appData.hashProgress.value }}
     <div>
-      <el-button type="primary" @click="handleUpload">上 传</el-button>
+      <el-button type="primary" @click="appData.handleUpload()">
+        上 传
+      </el-button>
+    </div>
+    <div>
+      <el-button type="primary" @click="appData.handleUploadStrategy()">
+        慢启动上传
+      </el-button>
+      <p>
+        由于文件大小不一，我们每个切片的大小设置成固定的也有点略显笨拙，我们可以参考TCP协议的慢启动策略，
+        . 设置一个初始大小，根据上传任务完成的时候，来动态调整下一个切片的大小，
+        确保文件切片的大小和当前网速匹配
+      </p>
+      <p>
+        初始大小定为1M，如果上传花了10秒，那下一个区块大小变成3M
+        如果上传花了60秒，那下一个区块大小变成500KB 以此类推
+      </p>
     </div>
     <!-- 方块进度条 -->
     <div class="cube-container" :style="{ width: cubeWidth + 'px' }">
@@ -67,10 +83,6 @@ const uploadProgress = computed(() => {
 const cubeWidth = computed(() => {
   return Math.ceil(Math.sqrt(appData.state.chunks.length)) * 24
 })
-
-const handleUpload = () => {
-  appData.handleUpload()
-}
 
 const dragRef = ref<HTMLDivElement>()
 onMounted(() => {

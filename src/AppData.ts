@@ -198,4 +198,52 @@ export default class AppData {
       hash: this.state.hash
     })
   }
+
+  /** 慢启动上传 */
+  handleUploadStrategy = async () => {
+    if (!this.state.file) return
+    const fileSize = this.state.file.size
+    let offset = 0.1 * 1024 * 1024
+
+    let cur = 0
+    let count = 0
+    this.state.hash = await calculateHashSample(
+      this.state.file,
+      this.hashProgress
+    )
+
+    while (cur < fileSize) {
+      const chunk = this.state.file.slice(cur, cur + offset)
+      cur += offset
+      const chunkName = this.state.hash + '-' + count
+      const form = new FormData()
+
+      form.append('chunkname', chunkName)
+      form.append('ext', ext(this.state.file.name))
+      form.append('hash', this.state.hash)
+      form.append('file', chunk)
+
+      let start = new Date().getTime()
+      await uploadFileBlock(form)
+      const now = new Date().getTime()
+
+      const time = ((now - start) / 1000).toFixed(4)
+
+      // 期望10秒一个切片
+      let rate = +time / 10
+      // 速率有最大和最小 可以考虑更平滑的过滤 比如1/tan
+      if (rate < 0.5) rate = 0.5
+      if (rate > 2) rate = 2
+      // 新的切片大小等比变化
+      console.log(
+        `切片${count}大小是${offset},耗时${time}秒，是30秒的${rate}倍，修正大小为${
+          offset / rate
+        }`
+      )
+      offset = Math.floor(offset / rate)
+      count++
+    }
+
+    this.mergeRequest()
+  }
 }

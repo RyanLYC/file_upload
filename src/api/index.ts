@@ -43,7 +43,7 @@ export function merge(data: CMFileReq): AxiosPromise<UploadFileResp> {
 /** 上传块文件 */
 export function uploadFileBlock(
   data: any,
-  onUploadProgress: (progressEvent: AxiosProgressEvent) => void
+  onUploadProgress?: (progressEvent: AxiosProgressEvent) => void
 ): AxiosPromise<UploadFileResp> {
   return request({
     url: '/uploadFileBlock',
